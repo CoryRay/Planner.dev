@@ -1,0 +1,17 @@
+body {
+	background-color: #99CCFF;
+	background-image: url('../img/blue_balls.gif');
+	font-family: sans-serif;
+	text-align: center;
+	text-decoration: black
+}
+h2  {
+	text-decoration: underline;
+	color: #669900
+}
+ul {
+	list-style: none
+}
+div {
+	background-color: rgba(254, 254, 254, .5);
+}
