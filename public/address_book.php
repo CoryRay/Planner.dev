@@ -1,7 +1,31 @@
 <?php
+// THIS CHECKS THAT ALL FIELDS ARE FILLED IN
+	$required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
+	$error = false;
+	foreach($required as $form) {
+	  if (isset($_POST[$form])) {
+	    $error = true;
+	  }
+	}
+
+//CHECKS IF A NEW CONTACT WAS ADDED
 	if (!empty($_POST['newName'])) {
 		add_new_contact();
 		// save_file($contacts);
+	}
+
+	//REMOVE ITEMS FROM LIST [[FROM TODOLIST]]
+	if (isset($_GET['remove'])) {
+		// Define variable $keyToRemove according to value
+		$keyToRemove = $_GET['remove'];
+		// Remove item from array according to key specified
+		unset($contacts[$keyToRemove]);
+		// Numerically reindex values in array after removing item
+		$contacts = array_values($contacts);
+		//file_put_contents adds data as a string so, the array must be imploded
+		$string = implode(PHP_EOL, $contacts);
+		// Save to file
+		save_file($contacts);
 	}
 
 	$contacts = array_map('str_getcsv', file('data/contacts.csv'));
@@ -25,7 +49,9 @@
 		fputcsv($handle, $new_contact);
 		fclose($handle);
 	}
-		
+
+
+
 ?>
 <!doctype html>
 <html>
@@ -43,11 +69,12 @@
 	    	<h2>Address Book</h2>
 			<!-- DISPLAYS ADDRESS BOOK IN DEFINITION LIST -->
 				<dl>
-					<?php foreach($contacts as $person): ?>
+					<?php foreach($contacts as $key => $person): ?>
 					<dt><?= $person[0]; ?></dt>
 						<dd><?= $person[1]; ?></dd>
 						<dd><?= $person[2] . ', ' . $person[3]; ?></dd>
 						<dd><?= $person[4] . PHP_EOL; ?></dd>
+						<button class='btn btn-danger'><?= "<a href=?remove=$key>Remove Contact</a>"; ?></button>
 					<?php endforeach; ?>
 					</dl>
 
@@ -74,6 +101,7 @@
 						<label for="newZip"></label>
 						<input type="number" id="newZip" name="newZip" placeholder='Zip Code'>
 					</p>
+					<?php if ($error) { echo "<p>All fields are required.</p>"; } ?>
 					<button class="btn btn-success">Add Contact</button>
 				</form>
 
