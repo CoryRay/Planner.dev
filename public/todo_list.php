@@ -58,7 +58,7 @@ $todo_items = file('data/todo_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY
 		<link type="text/css" rel="stylesheet" href="css/todo_list.css"/>
 		<title>Todo List</title>
 		<link rel="shortcut icon"
-		    href="favicon.ico"
+		    href="img/donkey.ico"
 		    type="image/x-icon" />
 
 	</head>
@@ -73,14 +73,14 @@ $todo_items = file('data/todo_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY
 	 				    //$addl_items = file('data/todo_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	 				    //   $todo_items = array_merge($todo_items, $addl_items);
 
-			//DISPLAYS FILE CONTENTS
+					//DISPLAYS FILE CONTENTS
 						foreach ($todo_items as $key => $value) {
-							echo "<li> <a href=" . "?remove=$key" . '>Complete</a> - ' . $value . "</li>";
+							echo "<li> <a href=" . "?remove=$key" . '>Complete</a> - ' . htmlspecialchars(strip_tags($value)) . "</li>";
 						};
 					?>
 			</ol>
 
-<!-- ADDING ITEMS TO TODO LIST -->
+	<!-- ADDING ITEMS TO TODO LIST -->
 			<h3>Add Item</h3>
 
 			<form method="POST" action="todo_list.php">
@@ -91,7 +91,7 @@ $todo_items = file('data/todo_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY
 				<button>Add Item</button>
 			</form>
 
-<!-- UPLOADING A NEW LIST -->
+	<!-- UPLOADING A NEW LIST -->
 			<h3>Upload a Todo List</h3>
 
 			<form method="POST" enctype="multipart/form-data" action="todo_list.php">
