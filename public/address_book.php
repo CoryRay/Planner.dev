@@ -1,7 +1,42 @@
 <?php
-// THIS CHECKS THAT ALL FIELDS ARE FILLED IN
+//NEW CLASS
+class AddressDataStore {
 
-//CHECKS IF A NEW CONTACT WAS ADDED
+    public $filename = 'data/contacts.csv';
+
+    //i would call this funtion by:
+    //$variable = AddressDataStore->read_address_book();
+    function read_address_book()
+    {
+        return array_map('str_getcsv', file($this->filename));
+        ////OR
+        // $handle = fopen('data/contacts.csv', 'r');
+        // $contacts = [];
+        // while(!feof($handle)) {
+        //  $contacts[] = fgetcsv($handle);
+        // }
+        // fclose($handle);
+    }
+
+    function write_address_book($contacts)
+    {
+        $handle = fopen($this->filename, 'a');
+        foreach ($contacts as $key => $person) {
+            fputcsv($handle, $person);
+        }
+        fclose($handle);
+    }
+}
+
+//CREATE NEW INSTANCE OF THE CLASS
+//this new particular instance is called $ads
+//from $ads, we can call any method/function inside the class
+$ads = new AddressDataStore();
+
+//this sets the returned value of method read_address_book to $contacts
+$contacts = $ads->read_address_book();
+
+/////////CHECKS IF A NEW CONTACT WAS ADDED
 if (!empty($_POST)) {
     $required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
     $error = false;
@@ -12,12 +47,13 @@ if (!empty($_POST)) {
         }
     }
     if (!$error) {
-        add_new_contact();
-    }
-    // save_file($contacts);
-}
+        $ads->write_address_book();
+    } 
+} //END IF STATEMENT
 
-//REMOVE ITEMS FROM LIST [[FROM TODOLIST]]
+
+
+//REMOVE CONTACTS FROM ADDRESSBOOK
 if (isset($_GET['remove'])) {
     // Define variable $keyToRemove according to value
     $keyToRemove = $_GET['remove'];
@@ -25,33 +61,9 @@ if (isset($_GET['remove'])) {
     unset($contacts[$keyToRemove]);
     // Numerically reindex values in array after removing item
     $contacts = array_values($contacts);
-    //file_put_contents adds data as a string so, the array must be imploded
-    $string = implode(PHP_EOL, $contacts);
-    // Save to file
-    save_file($contacts);
-}
-
-$contacts = array_map('str_getcsv', file('data/contacts.csv'));
-//OR
-    // $handle = fopen('data/contacts.csv', 'r');
-    // $contacts = [];
-    // while(!feof($handle)) {
-    //  $contacts[] = fgetcsv($handle);
-    // }
-    // fclose($handle);
-
-var_dump($_POST);
-
-function add_new_contact() {
-    //take in input
-    //  $_POST
-    $new_contact = $_POST;
-    //open file
-    $handle = fopen('data/contacts.csv', 'a');
-    //write to file
-    fputcsv($handle, $new_contact);
-    fclose($handle);
-}
+    //save the file
+    $ads->write_address_book($contacts);
+} //END IF STATEMENT
 
 ?>
 <!doctype html>
@@ -62,7 +74,7 @@ function add_new_contact() {
         <title>Address Book</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link type="text/css" rel="stylesheet" href="css/todo_list.css"/>
+        <link type="text/css" rel="stylesheet" href="css/address_book.css"/>
         <link rel="shortcut icon" href="img/book.ico" type="image/x-icon"/>
     </head>
     <body>
@@ -75,11 +87,11 @@ function add_new_contact() {
                         <dd><?= $person[1]; ?></dd>
                         <dd><?= $person[2] . ', ' . $person[3]; ?></dd>
                         <dd><?= $person[4] . PHP_EOL; ?></dd>
-                        <a href=?remove="<?= $key; ?>" class='btn btn-danger'>Remove Contact</a>
+                        <a href=?remove=<?= $key; ?> class='btn btn-danger'>Remove Contact</a>
                     <?php endforeach; ?>
                     </dl>
 
-        <!-- ADDING NEW CONTACTS -->
+        <!-- ADD NEW CONTACT FORM -->
             <h3>Add a New Contact:</h3>
             <form method="POST" action="address_book.php" role='from'>
                     <p>
@@ -102,7 +114,7 @@ function add_new_contact() {
                         <label for="newZip"></label>
                         <input type="number" id="newZip" name="newZip" placeholder='Zip Code'>
                     </p>
-                    <?php if ($error) { echo "<p>All fields are required.</p>"; } ?>
+                    <?php if (!empty($error)) { echo "<p>All fields are required.</p>"; } ?>
                     <button class="btn btn-success">Add Contact</button>
                 </form>
 
