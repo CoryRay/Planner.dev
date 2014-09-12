@@ -20,7 +20,7 @@ class AddressDataStore {
 
     function write_address_book($contacts)
     {
-        $handle = fopen($this->filename, 'a');
+        $handle = fopen($this->filename, 'w');
         foreach ($contacts as $key => $person) {
             fputcsv($handle, $person);
         }
@@ -42,12 +42,16 @@ if (!empty($_POST)) {
     $error = false;
     
     foreach($required as $form) {
-        if (isset($_POST[$form])) {
+        if (empty($_POST[$form])) {
             $error = true;
+        }
+        else {
+            $newContact[] = $_POST[$form];
         }
     }
     if (!$error) {
-        $ads->write_address_book();
+        $contacts[] = $newContact;
+        $ads->write_address_book($contacts);
     } 
 } //END IF STATEMENT
 
