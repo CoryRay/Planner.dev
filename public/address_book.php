@@ -1,11 +1,15 @@
 <?php
+
+//$filename = '';
+
 //NEW CLASS
-
-$filename = '';
-
 class AddressDataStore {
 
-    public $filename = 'data/contacts.csv';
+    public $filename = '';
+
+    public function __construct($filename = 'data/contacts.csv') {
+        $this->filename = $filename;
+    }
 
     //i would call this funtion by:
     //$variable = AddressDataStore->read_address_book();
@@ -30,9 +34,6 @@ class AddressDataStore {
         fclose($handle);
     }
 
-    public function __construct($filename = FILENAME) {
-        $this->filename = $filename;
-    }
 }
 
 //CREATE NEW INSTANCE OF THE CLASS
@@ -40,10 +41,11 @@ class AddressDataStore {
 //from $ads, we can call any method/function inside the class
 $ads = new AddressDataStore();
 
+
 //this sets the returned value of method read_address_book to $contacts
 $contacts = $ads->read_address_book();
 
-/////////CHECKS IF A NEW CONTACT WAS ADDED
+/////////CHECKS IF A NEW CONTACT WAS ADDED FROM FORM
 if (!empty($_POST)) {
     $required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
     $error = false;
@@ -61,6 +63,21 @@ if (!empty($_POST)) {
         $ads->write_address_book($contacts);
     } 
 } //END IF STATEMENT
+
+//UPLOADED CONTACT LIST
+if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
+    $upload_dir = 'uploads/';
+    $filename = basename($_FILES['UploadedCsv']['error']);
+    $saved_filename = $upload_dir . $filename;
+    move_uploaded_file($_FILES['UploadedCsv']['tmp_name'], $saved_filename);
+
+    // open that saved_filname with the method from our object we've created
+    // add that data, to our existing array of contacts
+    // save to file
+    $new_contacts = $ads->read_address_book($saved_filename);
+    $contacts = array_merge($contacts, $new_contacts);
+    $ads->write_address_book($contacts);
+}
 
 
 
@@ -129,6 +146,22 @@ if (isset($_GET['remove'])) {
                     <button class="btn btn-success">Add Contact</button>
                 </form>
 
+            <h3>Add a New Address Book:</h3>
+            <form method="POST" enctype="multipart/form-data" action="address_book.php">
+                <p>
+                    <label for="UploadedCsv">Upload a CSV file: </label>
+                    <input type="file" name="UploadedCsv" id="UploadedCsv">
+                    <p><input type="submit" value="Upload"></p>
+                </p>
+            </form>
+             <?php 
+            // VERIFY UPLOAD SUCCESSFUL
+                // Check if we uploaded a file
+                if (isset($saved_filename)) {
+                    // If we did, show a link to the uploaded file
+                    echo "<p>Upload Successful!</p>";
+                }
+            ?>
         </div>
          
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
