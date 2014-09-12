@@ -3,7 +3,7 @@
 //$filename = '';
 
 //NEW CLASS
-include 'inc/address_data_store';
+require_once 'inc/address_data_store';
 
 //CREATE NEW INSTANCE OF THE CLASS
 //this new particular instance is called $ads
