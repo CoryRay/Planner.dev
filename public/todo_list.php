@@ -98,9 +98,7 @@ if (isset($_GET['remove'])) {
                 <p>
                     <label for="file1">File to upload: </label>
                     <input type="file" id="file1" name="file1">
-                </p>
-                <p>
-            <input type="submit" value="Upload">
+                   <p><input type="submit" value="Upload"></p>
                 </p>
             </form>
             <?php 
