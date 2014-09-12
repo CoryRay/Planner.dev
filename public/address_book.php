@@ -1,5 +1,8 @@
 <?php
 //NEW CLASS
+
+$filename = '';
+
 class AddressDataStore {
 
     public $filename = 'data/contacts.csv';
@@ -25,6 +28,10 @@ class AddressDataStore {
             fputcsv($handle, $person);
         }
         fclose($handle);
+    }
+
+    public function __construct($filename = FILENAME) {
+        $this->filename = $filename;
     }
 }
 
