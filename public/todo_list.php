@@ -6,6 +6,29 @@ $todo = new Filestore('data/todo_list.txt');
 
 $todo_items = $todo->read();
 
+//ADDING NEW ITEM TO THE FILE
+if (isset($_POST['newItem'])) {
+    //USE EXCEPTION TO MAKE SURE THE ITEM IS LESS THAN 240 CHARACTERS
+    if (strlen($_POST['newItem']) > 240 || empty($_POST['newItem'])) {
+        throw new Exception("Error, item must be less than (<) 240 characters.");    
+    }
+    array_push($todo_items, $_POST['newItem']);
+    $todo->write($todo_items);
+}
+
+
+//REMOVE ITEMS FROM LIST
+if (isset($_GET['remove'])) {
+    // Define variable $keyToRemove according to value
+    $keyToRemove = $_GET['remove'];
+    // Remove item from array according to key specified
+    unset($todo_items[$keyToRemove]);
+    // Numerically reindex values in array after removing item
+    $todo_items = array_values($todo_items);
+    // Save to file
+    $todo->write($todo_items);
+}
+
 //FILE UPLOAD AND WRITE TO 
 if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     // Set the destination directory for uploads
@@ -25,29 +48,6 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     //save the new todo list
     $uploaded_items = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $todo_items = array_merge($todo_items, $uploaded_items);
-    $todo->write($todo_items);
-}
-
-//ADDING NEW ITEM TO THE FILE
-if (!empty($_POST['newItem'])) {
-    array_push($todo_items, $_POST['newItem']);
-    $todo->write($todo_items);
-}
-
-//file_get_contents — Reads entire file into a string
-//may use later ^
-
-//REMOVE ITEMS FROM LIST
-if (isset($_GET['remove'])) {
-    // Define variable $keyToRemove according to value
-    $keyToRemove = $_GET['remove'];
-    // Remove item from array according to key specified
-    unset($todo_items[$keyToRemove]);
-    // Numerically reindex values in array after removing item
-    $todo_items = array_values($todo_items);
-    //file_put_contents adds data as a string so, the array must be imploded
-    $string = implode(PHP_EOL, $todo_items);
-    // Save to file
     $todo->write($todo_items);
 }
 
@@ -84,7 +84,7 @@ if (isset($_GET['remove'])) {
             <form method="POST" action="todo_list.php">
                 <p>
                     <label for="newItem">Enter new todo item:</label>
-                    <input type="text" id="newItem" name="newItem" required>
+                    <input type="text" id="newItem" name="newItem" required focus>
                 </p>
                 <button>Add Item</button>
             </form>

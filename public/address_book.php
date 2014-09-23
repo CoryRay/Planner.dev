@@ -1,8 +1,5 @@
 <?php
 
-//$filename = '';
-
-//NEW CLASS
 require_once 'inc/address_data_store.php';
 
 //CREATE NEW INSTANCE OF THE CLASS
@@ -10,17 +7,17 @@ require_once 'inc/address_data_store.php';
 //from $ads, we can call any method/function inside the class
 $ads = new AddressDataStore('data/contacts.csv');
 
-
 //this sets the returned value of method read to $contacts
 $contacts = $ads->read();
-/////////CHECKS IF A NEW CONTACT WAS ADDED FROM FORM
+
+//ADDS NEW CONTACT OR OUTPUTS AN ERROR
 if (!empty($_POST)) {
     $required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
     $error = false;
     
     foreach($required as $form) {
-        if (empty($_POST[$form])) {
-            $error = true;
+        if (strlen($_POST[$form]) > 125) {
+            throw new Exception("Please keep your entries below 125 characters.");
         }
         else {
             $newContact[] = $_POST[$form];
@@ -30,7 +27,19 @@ if (!empty($_POST)) {
         $contacts[] = $newContact;
         $ads->write($contacts);
     } 
-} //END IF STATEMENT
+}
+
+//REMOVE CONTACTS FROM ADDRESSBOOK
+if (isset($_GET['remove'])) {
+    // Define variable $keyToRemove according to value
+    $keyToRemove = $_GET['remove'];
+    // Remove item from array according to key specified
+    unset($contacts[$keyToRemove]);
+    // Numerically reindex values in array after removing item
+    $contacts = array_values($contacts);
+    //save the file
+    $ads->write($contacts);
+}
 
 //UPLOADED CONTACT LIST
 if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
@@ -46,18 +55,6 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
     $contacts = array_merge($contacts, $new_contacts);
     $ads->write($contacts);
 }
-
-//REMOVE CONTACTS FROM ADDRESSBOOK
-if (isset($_GET['remove'])) {
-    // Define variable $keyToRemove according to value
-    $keyToRemove = $_GET['remove'];
-    // Remove item from array according to key specified
-    unset($contacts[$keyToRemove]);
-    // Numerically reindex values in array after removing item
-    $contacts = array_values($contacts);
-    //save the file
-    $ads->write($contacts);
-} //END IF STATEMENT
 
 ?>
 <!doctype html>
@@ -75,17 +72,17 @@ if (isset($_GET['remove'])) {
         <div class='container'>
             <h2>Address Book</h2>
             <!-- DISPLAYS ADDRESS BOOK IN DEFINITION LIST -->
-                    <?php foreach($contacts as $key => $person): ?>
+                <?php foreach($contacts as $key => $person): ?>
             <div class="col-md-2">
                 <dl>
-                        <dt><?= htmlspecialchars(strip_tags($person[0])); ?></dt>
-                            <dd><?= htmlspecialchars(strip_tags($person[1])); ?></dd>
-                            <dd><?= htmlspecialchars(strip_tags($person[2])) . ', ' . $person[3]; ?></dd>
-                            <dd><?= htmlspecialchars(strip_tags($person[4])) . PHP_EOL; ?></dd>
-                            <a href=?remove=<?= $key; ?> class='btn-xs btn-danger'>Remove Contact</a>
+                    <dt><?= htmlspecialchars(strip_tags($person[0])); ?></dt>
+                        <dd><?= htmlspecialchars(strip_tags($person[1])); ?></dd>
+                        <dd><?= htmlspecialchars(strip_tags($person[2])) . ', ' . $person[3]; ?></dd>
+                        <dd><?= htmlspecialchars(strip_tags($person[4])) . PHP_EOL; ?></dd>
+                        <a href=?remove=<?= $key; ?> class='btn-xs btn-danger'>Remove Contact</a>
                 </dl>
             </div>
-                    <?php endforeach; ?>
+                <?php endforeach; ?>
         <!-- ADD NEW CONTACT FORM -->
             <h3>Add a New Contact:</h3>
             <form method="POST" action="address_book.php" role='from'>
@@ -121,11 +118,9 @@ if (isset($_GET['remove'])) {
                     <p><input type="submit" value="Upload"></p>
                 </p>
             </form>
-             <?php 
-            // VERIFY UPLOAD SUCCESSFUL
-                // Check if we uploaded a file
+            <?php 
+                // VERIFY UPLOAD SUCCESSFUL
                 if (isset($saved_filename)) {
-                    // If we did, show a link to the uploaded file
                     echo "<p>Upload Successful!</p>";
                 }
             ?>
