@@ -55,9 +55,8 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
     $contacts = array_merge($contacts, $new_contacts);
     $ads->write($contacts);
 }
-
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">

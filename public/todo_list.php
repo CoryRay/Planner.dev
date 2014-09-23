@@ -16,7 +16,6 @@ if (isset($_POST['newItem'])) {
     $todo->write($todo_items);
 }
 
-
 //REMOVE ITEMS FROM LIST
 if (isset($_GET['remove'])) {
     // Define variable $keyToRemove according to value
@@ -50,7 +49,6 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     $todo_items = array_merge($todo_items, $uploaded_items);
     $todo->write($todo_items);
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +82,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
             <form method="POST" action="todo_list.php">
                 <p>
                     <label for="newItem">Enter new todo item:</label>
-                    <input type="text" id="newItem" name="newItem" required focus>
+                    <input type="text" id="newItem" name="newItem" required autofocus>
                 </p>
                 <button>Add Item</button>
             </form>
@@ -100,10 +98,8 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
                 </p>
             </form>
             <?php 
-            // VERIFY UPLOAD SUCCESSFUL
-                // Check if we uploaded a file
+                // VERIFY UPLOAD SUCCESSFUL
                 if (isset($saved_filename)) {
-                    // If we did, show a link to the uploaded file
                     echo "Upload Successful!";
                 }
             ?>
