@@ -3,17 +3,16 @@
 //$filename = '';
 
 //NEW CLASS
-require_once 'inc/address_data_store';
+require_once 'inc/address_data_store.php';
 
 //CREATE NEW INSTANCE OF THE CLASS
 //this new particular instance is called $ads
 //from $ads, we can call any method/function inside the class
-$ads = new AddressDataStore();
+$ads = new AddressDataStore('data/contacts.csv');
 
 
-//this sets the returned value of method read_address_book to $contacts
-$contacts = $ads->read_address_book();
-
+//this sets the returned value of method read to $contacts
+$contacts = $ads->read();
 /////////CHECKS IF A NEW CONTACT WAS ADDED FROM FORM
 if (!empty($_POST)) {
     $required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
@@ -29,7 +28,7 @@ if (!empty($_POST)) {
     }
     if (!$error) {
         $contacts[] = $newContact;
-        $ads->write_address_book($contacts);
+        $ads->write($contacts);
     } 
 } //END IF STATEMENT
 
@@ -43,12 +42,10 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
     // open that saved_filname with the method from our object we've created
     // add that data, to our existing array of contacts
     // save to file
-    $new_contacts = $ads->read_address_book($saved_filename);
+    $new_contacts = $ads->read($saved_filename);
     $contacts = array_merge($contacts, $new_contacts);
-    $ads->write_address_book($contacts);
+    $ads->write($contacts);
 }
-
-
 
 //REMOVE CONTACTS FROM ADDRESSBOOK
 if (isset($_GET['remove'])) {
@@ -59,7 +56,7 @@ if (isset($_GET['remove'])) {
     // Numerically reindex values in array after removing item
     $contacts = array_values($contacts);
     //save the file
-    $ads->write_address_book($contacts);
+    $ads->write($contacts);
 } //END IF STATEMENT
 
 ?>
@@ -78,38 +75,39 @@ if (isset($_GET['remove'])) {
         <div class='container'>
             <h2>Address Book</h2>
             <!-- DISPLAYS ADDRESS BOOK IN DEFINITION LIST -->
-                <dl>
                     <?php foreach($contacts as $key => $person): ?>
-                    <dt><?= $person[0]; ?></dt>
-                        <dd><?= $person[1]; ?></dd>
-                        <dd><?= $person[2] . ', ' . $person[3]; ?></dd>
-                        <dd><?= $person[4] . PHP_EOL; ?></dd>
-                        <a href=?remove=<?= $key; ?> class='btn btn-danger'>Remove Contact</a>
+            <div class="col-md-2">
+                <dl>
+                        <dt><?= htmlspecialchars(strip_tags($person[0])); ?></dt>
+                            <dd><?= htmlspecialchars(strip_tags($person[1])); ?></dd>
+                            <dd><?= htmlspecialchars(strip_tags($person[2])) . ', ' . $person[3]; ?></dd>
+                            <dd><?= htmlspecialchars(strip_tags($person[4])) . PHP_EOL; ?></dd>
+                            <a href=?remove=<?= $key; ?> class='btn-xs btn-danger'>Remove Contact</a>
+                </dl>
+            </div>
                     <?php endforeach; ?>
-                    </dl>
-
         <!-- ADD NEW CONTACT FORM -->
             <h3>Add a New Contact:</h3>
             <form method="POST" action="address_book.php" role='from'>
                     <p>
                         <label for="newName"></label>
-                        <input type="text" id="newName" name="newName" placeholder='First and last name'>
+                        <input type="text" id="newName" name="newName" placeholder='First and last name' required>
                     </p>
                     <p>
                         <label for="newAddress"></label>
-                        <input type="text" id="newAddress" name="newAddress" placeholder='Address'>
+                        <input type="text" id="newAddress" name="newAddress" placeholder='Address' required>
                     </p>
                     <p>
                         <label for="newCity"></label>
-                        <input type="text" id="newCity" name="newCity" placeholder='City'>
+                        <input type="text" id="newCity" name="newCity" placeholder='City' required>
                     </p>
                     <p>
                         <label for="newState"></label>
-                        <input type="text" maxlength='2' id="newState" name="newState" placeholder='State'>
+                        <input type="text" maxlength='2' id="newState" name="newState" placeholder='State' required>
                     </p>
                     <p>
                         <label for="newZip"></label>
-                        <input type="number" id="newZip" name="newZip" placeholder='Zip Code'>
+                        <input type="number" id="newZip" name="newZip" placeholder='Zip Code' required>
                     </p>
                     <?php if (!empty($error)) { echo "<p>All fields are required.</p>"; } ?>
                     <button class="btn btn-success">Add Contact</button>

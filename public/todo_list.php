@@ -1,12 +1,10 @@
 <?php
 
-$todo_items = file('data/todo_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+require_once 'inc/filestore.php';
 
-function save_file($items, $filename = 'data/todo_list.txt') {
-    $fixed_string = implode(PHP_EOL, $items);
-    file_put_contents($filename, $fixed_string);
-    //the file_put_contents function opens, writes and closes a file
-}
+$todo = new Filestore('data/todo_list.txt');
+
+$todo_items = $todo->read();
 
 //FILE UPLOAD AND WRITE TO 
 if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
@@ -27,13 +25,13 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     //save the new todo list
     $uploaded_items = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $todo_items = array_merge($todo_items, $uploaded_items);
-    save_file($todo_items);
+    $todo->write($todo_items);
 }
 
-//ADDING TO THE FILE
+//ADDING NEW ITEM TO THE FILE
 if (!empty($_POST['newItem'])) {
     array_push($todo_items, $_POST['newItem']);
-    save_file($todo_items);
+    $todo->write($todo_items);
 }
 
 //file_get_contents — Reads entire file into a string
@@ -50,7 +48,7 @@ if (isset($_GET['remove'])) {
     //file_put_contents adds data as a string so, the array must be imploded
     $string = implode(PHP_EOL, $todo_items);
     // Save to file
-    save_file($todo_items);
+    $todo->write($todo_items);
 }
 
 ?>
@@ -86,7 +84,7 @@ if (isset($_GET['remove'])) {
             <form method="POST" action="todo_list.php">
                 <p>
                     <label for="newItem">Enter new todo item:</label>
-                    <input type="text" id="newItem" name="newItem">
+                    <input type="text" id="newItem" name="newItem" required>
                 </p>
                 <button>Add Item</button>
             </form>
@@ -97,7 +95,7 @@ if (isset($_GET['remove'])) {
             <form method="POST" enctype="multipart/form-data" action="todo_list.php">
                 <p>
                     <label for="file1">File to upload: </label>
-                    <input type="file" id="file1" name="file1">
+                    <input type="file" id="file1" name="file1" required>
                    <p><input type="submit" value="Upload"></p>
                 </p>
             </form>
