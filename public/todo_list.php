@@ -1,42 +1,86 @@
 <?php
 
-require_once 'inc/filestore.php';
 require_once '../todo_dbconnect.php';
+require_once 'inc/filestore.php';
 
 $todo = new Filestore('data/todo_list.txt');
 
-//READ FILE
-$todo_items = $todo->read();
 
-//ADDING NEW ITEM TO THE FILE
-if (isset($_POST['newItem'])) {
-    try {
-        if (strlen($_POST['newItem']) > 240 || empty($_POST['newItem'])) {
-            throw new Exception("Error, item must be less than (<) 240 characters.");    
-            //USE EXCEPTION TO MAKE SURE THE ITEM IS LESS THAN 240 CHARACTERS
-            array_push($todo_items, $_POST['newItem']);
-            $todo->write($todo_items);
-        }   
-    } catch (Exception $e) {
-        echo $e->getMessage();
-    }
+$offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+
+///s/PERFORM ALL DATABASE ACTIONS BEFORE DISPLAYING IT
+
+//ADDING TO THE DATABASE
+if (!empty($_POST)) {
+
+    //capture the data from post array
+    $new_item = $_POST;
+
+    $query = "INSERT INTO todo_list (todo_item)
+              VALUES (:todo_item)";
+
+    $prepare_to_add = $dbc->prepare($query);
+    $prepare_to_add->bindValue(':todo_item', $_POST['newItem'], PDO::PARAM_STR);
+
+    $prepare_to_add->execute();
 }
 
-
-//REMOVE ITEMS FROM LIST
+//REMOVING FROM DATABASE - DOES NOT WORK
 if (isset($_GET['remove'])) {
-
     // Define variable $keyToRemove according to value
     $keyToRemove = $_GET['remove'];
 
-    // Remove item from array according to key specified
-    unset($todo_items[$keyToRemove]);
-
-    // Numerically reindex values in array after removing item
-    $todo_items = array_values($todo_items);
-    $todo->write($todo_items);
+    $dbc->exec("DELETE FROM todo_list
+                WHERE id = $keyToRemove");
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//READS DATABASE, SHOULD BE LAST
+$stmt = $dbc->query("SELECT * 
+                     FROM todo_list LIMIT 100 OFFSET $offset");
+$row = $stmt->fetchall();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //REMOVE ITEMS FROM LIST
+// if (isset($_GET['remove'])) {
+
+//     // Define variable $keyToRemove according to value
+//     $keyToRemove = $_GET['remove'];
+
+//     // Remove item from array according to key specified
+//     unset($todo_items[$keyToRemove]);
+
+//     // Numerically reindex values in array after removing item
+//     $todo_items = array_values($todo_items);
+//     $todo->write($todo_items);
+// }
 //FILE UPLOAD AND WRITE TO 
 if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     // Set the destination directory for uploads
@@ -75,8 +119,11 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 
     <!-- DISPLAY TODO LIST -->
             <ol id='list'>
-                <? foreach ($todo_items as $key => $value) : ?>
-                    <?= "<li> <a href=" . "?remove=$key" . '>Complete</a> - ' . htmlspecialchars(strip_tags($value)) . "</li>"; ?>
+                <? foreach ($row as $key => $value) : ?>
+                    <li> 
+                        <a href="?remove=<?= $value['id']; ?>">Complete</a> -  
+                        <?= htmlspecialchars(strip_tags($value['todo_item'])); ?>
+                    </li>
                 <? endforeach; ?>
 
     <!-- ADDING ITEMS TO TODO LIST -->
