@@ -1,31 +1,26 @@
 <?php
 
 require_once '../todo_dbconnect.php';
-require_once 'inc/filestore.php';
-
-$todo = new Filestore('data/todo_list.txt');
-
 
 $offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
 
-///s/PERFORM ALL DATABASE ACTIONS BEFORE DISPLAYING IT
-
+////PERFORM ALL DATABASE ACTIONS BEFORE DISPLAYING IT
 //ADDING TO THE DATABASE
 if (!empty($_POST)) {
 
-    //capture the data from post array
     $new_item = $_POST;
 
     $query = "INSERT INTO todo_list (todo_item)
               VALUES (:todo_item)";
 
     $prepare_to_add = $dbc->prepare($query);
+
     $prepare_to_add->bindValue(':todo_item', $_POST['newItem'], PDO::PARAM_STR);
 
     $prepare_to_add->execute();
 }
 
-//REMOVING FROM DATABASE - DOES NOT WORK
+//REMOVING FROM DATABASE
 if (isset($_GET['remove'])) {
     // Define variable $keyToRemove according to value
     $keyToRemove = $_GET['remove'];
@@ -34,74 +29,38 @@ if (isset($_GET['remove'])) {
                 WHERE id = $keyToRemove");
 }
 
+//UPLOAD FILE AND ADD TO DATABASE
+if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
+    $upload_dir = 'uploads/';
 
+    $filename = basename($_FILES['file1']['name']);
 
+    $saved_filename = $upload_dir . $filename;
 
+    move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
 
+    $uploaded_item = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
+    foreach ($uploaded_item as $line) {
+        
+    }
 
+    $insertQuery = "INSERT INTO todo_list (todo_item)
+                    VALUES (:uploaded_items)";
 
+    $prepare = $dbc->prepare($insertQuery);
 
+    $prepare->bindValue(':uploaded_items', $uploaded_items, PDO::PARAM_STR);
 
+    $prepare->execute();
 
-
-
+}
 
 //READS DATABASE, SHOULD BE LAST
 $stmt = $dbc->query("SELECT * 
-                     FROM todo_list LIMIT 100 OFFSET $offset");
+                     FROM todo_list LIMIT 10 OFFSET $offset");
 $row = $stmt->fetchall();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// //REMOVE ITEMS FROM LIST
-// if (isset($_GET['remove'])) {
-
-//     // Define variable $keyToRemove according to value
-//     $keyToRemove = $_GET['remove'];
-
-//     // Remove item from array according to key specified
-//     unset($todo_items[$keyToRemove]);
-
-//     // Numerically reindex values in array after removing item
-//     $todo_items = array_values($todo_items);
-//     $todo->write($todo_items);
-// }
-//FILE UPLOAD AND WRITE TO 
-if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
-    // Set the destination directory for uploads
-    $upload_dir = 'uploads/';
-
-    // Grab the filename from the uploaded file by using basename
-    $filename = basename($_FILES['file1']['name']);
-
-    // Create the saved filename using the file's original name and our upload directory
-    $saved_filename = $upload_dir . $filename;
-
-    // Move the file from the temp location to our uploads directory
-    move_uploaded_file($_FILES['file1']['tmp_name'], $saved_filename);
-
-    //need to grab the contents of the uploaded file
-    //merge with $todo_items
-    //save the new todo list
-    $uploaded_items = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $todo_items = array_merge($todo_items, $uploaded_items);
-    $todo->write($todo_items);
-}
 ?>
 
 <!DOCTYPE html>
