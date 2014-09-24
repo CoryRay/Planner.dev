@@ -1,30 +1,39 @@
 <?php
 
 require_once 'inc/filestore.php';
+require_once '../todo_dbconnect.php';
 
 $todo = new Filestore('data/todo_list.txt');
 
+//READ FILE
 $todo_items = $todo->read();
 
 //ADDING NEW ITEM TO THE FILE
 if (isset($_POST['newItem'])) {
-    //USE EXCEPTION TO MAKE SURE THE ITEM IS LESS THAN 240 CHARACTERS
-    if (strlen($_POST['newItem']) > 240 || empty($_POST['newItem'])) {
-        throw new Exception("Error, item must be less than (<) 240 characters.");    
+    try {
+        if (strlen($_POST['newItem']) > 240 || empty($_POST['newItem'])) {
+            throw new Exception("Error, item must be less than (<) 240 characters.");    
+            //USE EXCEPTION TO MAKE SURE THE ITEM IS LESS THAN 240 CHARACTERS
+            array_push($todo_items, $_POST['newItem']);
+            $todo->write($todo_items);
+        }   
+    } catch (Exception $e) {
+        echo $e->getMessage();
     }
-    array_push($todo_items, $_POST['newItem']);
-    $todo->write($todo_items);
 }
+
 
 //REMOVE ITEMS FROM LIST
 if (isset($_GET['remove'])) {
+
     // Define variable $keyToRemove according to value
     $keyToRemove = $_GET['remove'];
+
     // Remove item from array according to key specified
     unset($todo_items[$keyToRemove]);
+
     // Numerically reindex values in array after removing item
     $todo_items = array_values($todo_items);
-    // Save to file
     $todo->write($todo_items);
 }
 
@@ -58,23 +67,17 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
         <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
         <link type="text/css" rel="stylesheet" href="css/todo_list.css"/>
         <title>Todo List</title>
-        <link rel="shortcut icon"
-            href="img/donkey.ico"
-            type="image/x-icon" />
-
     </head>
     <body>
         <div class='container-fluid'>
+
             <h2>Todo List</h2>
 
+    <!-- DISPLAY TODO LIST -->
             <ol id='list'>
-                <?php
-                    //DISPLAYS FILE CONTENTS
-                    foreach ($todo_items as $key => $value) {
-                        echo "<li> <a href=" . "?remove=$key" . '>Complete</a> - ' . htmlspecialchars(strip_tags($value)) . "</li>";
-                    }
-                ?>
-            </ol>
+                <? foreach ($todo_items as $key => $value) : ?>
+                    <?= "<li> <a href=" . "?remove=$key" . '>Complete</a> - ' . htmlspecialchars(strip_tags($value)) . "</li>"; ?>
+                <? endforeach; ?>
 
     <!-- ADDING ITEMS TO TODO LIST -->
             <h3>Add Item</h3>
@@ -82,7 +85,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
             <form method="POST" action="todo_list.php">
                 <p>
                     <label for="newItem">Enter new todo item:</label>
-                    <input type="text" id="newItem" name="newItem" required autofocus>
+                    <input type="text" id="newItem" name="newItem" autofocus required>
                 </p>
                 <button>Add Item</button>
             </form>
@@ -97,12 +100,9 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
                    <p><input type="submit" value="Upload"></p>
                 </p>
             </form>
-            <?php 
-                // VERIFY UPLOAD SUCCESSFUL
-                if (isset($saved_filename)) {
-                    echo "Upload Successful!";
-                }
-            ?>
+
+            <?= isset($saved_filename) ? '<div class="alert alert-info" role="alert">Upload Successful!</div>' : "" ; ?>
+        
         </div>
     </body> 
 </html>
