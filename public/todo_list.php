@@ -41,22 +41,21 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 
     $uploaded_item = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-    foreach ($uploaded_item as $line) {
-        
-    }
-
     $insertQuery = "INSERT INTO todo_list (todo_item)
                     VALUES (:uploaded_items)";
 
     $prepare = $dbc->prepare($insertQuery);
 
-    $prepare->bindValue(':uploaded_items', $uploaded_items, PDO::PARAM_STR);
+    foreach ($uploaded_item as $line) {
+        $prepare->bindValue(':uploaded_items', $line, PDO::PARAM_STR);
 
-    $prepare->execute();
+        $prepare->execute();
+    }
+
 
 }
 
-//READS DATABASE, SHOULD BE LAST
+//READING FROM DATABASE, SHOULD BE LAST
 $stmt = $dbc->query("SELECT * 
                      FROM todo_list LIMIT 10 OFFSET $offset");
 $row = $stmt->fetchall();
@@ -77,13 +76,30 @@ $row = $stmt->fetchall();
             <h2>Todo List</h2>
 
     <!-- DISPLAY TODO LIST -->
-            <ol id='list'>
+            <ul id='list'>
                 <? foreach ($row as $key => $value) : ?>
                     <li> 
                         <a href="?remove=<?= $value['id']; ?>">Complete</a> -  
                         <?= htmlspecialchars(strip_tags($value['todo_item'])); ?>
                     </li>
                 <? endforeach; ?>
+            </ul>
+
+    <!-- UGLY PAGINATOR -->
+            <ul class="pagination">
+                <? if ($offset > 0):
+                    echo "<li><a class='prev' href='?offset=" . ($offset - 10) . "'>&#171;</a></li>";
+                   else:
+                    echo "<li><a class='prev disabled' href='#'>&#171;</a></li>";
+                   endif;
+                ?>
+                <? if ($offset <= count($row)):
+                    echo "<li><a class='next' href='?offset=" . ($offset + 10) . "'>&#187;</a></li>";
+                   else:
+                    echo "<li><a class='next disabled' href='#'>&#187;</a></li>";
+                   endif;
+                ?>
+            </ul>
 
     <!-- ADDING ITEMS TO TODO LIST -->
             <h3>Add Item</h3>
