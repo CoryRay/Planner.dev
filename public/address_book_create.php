@@ -21,7 +21,6 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
     header('location: address_book.php');
     exit;
 }
-var_dump($dbc);
 
 ?>
 
@@ -38,23 +37,23 @@ var_dump($dbc);
             <form method="POST" action="address_book_create.php" role='form'>
                 <div class='form-group'>
                     <label for="newName"class="sr-only">First and Last Name</label>
-                    <input type="text" id="newName" name="newName" placeholder='First and last name'>
+                    <input type="text" id="newName" name="newName" placeholder='First and last name' required>
                 </div>
                 <div class='form-group'>
                     <label for="newAddress"class="sr-only">Street Address</label>
-                    <input type="text" id="newAddress" name="newAddress" placeholder='Address'>
+                    <input type="text" id="newAddress" name="newAddress" placeholder='Address' required>
                 </div>
                 <div class='form-group'>
                     <label for="newCity" class="sr-only">City</label>
-                    <input type="text" id="newCity" name="newCity" placeholder='City'>
+                    <input type="text" id="newCity" name="newCity" placeholder='City' required>
                 </div>
                 <div class='form-group'>
                     <label for="newState"class="sr-only">State</label>
-                    <input type="text" maxlength='2' id="newState" name="newState" placeholder='State'>
+                    <input type="text" maxlength='2' id="newState" name="newState" placeholder='State' required>
                 </div>
                 <div class='form-group'>
                     <label for="newZip"class="sr-only">Zip Code</label>
-                    <input type="number" id="newZip" name="newZip" placeholder='Zip Code'>
+                    <input type="number" id="newZip" name="newZip" placeholder='Zip Code' required>
                 </div>
                 <div class="form-group">
                     <button class="btn btn-success">Add Contact</button>

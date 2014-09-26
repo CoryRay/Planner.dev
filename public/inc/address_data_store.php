@@ -5,25 +5,30 @@ require 'inc/filestore.php';
 class AddressDataStore extends Filestore {
 
     public $dbc;
+    public $previouslyExistingName = FALSE;
     
     public function __construct($filename, $dbc) {
         parent::__construct(strtolower($filename));
         $this->dbc = $dbc;
     }
 
-    public function read_name_db() {
-        $stmt = $dbc->query("SELECT * 
-                             FROM name");
-        $row = $stmt->fetchall();
+    public function read_name_db() { //UNFINISHED
+        $stmt = $this->dbc->query("SELECT name.name, address.address FROM name 
+                                   JOIN address_name ON name.id = address_name.name_id
+                                   JOIN address ON address_name.address_id = address.id
+                                   WHERE address.is_primary = 1;");
+
+        return $names_row = $stmt->fetchall(PDO::FETCH_ASSOC);
     }
 
-    public function read_address_db() {
-        $stmt = $dbc->query("SELECT * 
+    public function read_address_db() { //UNFINISHED
+        $stmt = $this->dbc->query("SELECT *
                              FROM address");
-        $row = $stmt->fetchall();
+
+        return $addresses_row = $stmt->fetchall(PDO::FETCH_ASSOC);
     }
 
-    public function write_name_db($dbc) {
+    public function write_name_db() {
         $new_contact = $_POST;
 
         $query = "INSERT INTO name (name)
@@ -35,10 +40,7 @@ class AddressDataStore extends Filestore {
 
         $prepare_to_add->execute();
 
-        $this->write_address_db();
-
-        //write_db
-        //if name||address already exists, call different functions depending
+        $this->write_address_db();   
     }
     
     public function write_address_db() {
