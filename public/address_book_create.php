@@ -3,25 +3,10 @@
 require_once '../address_dbconnect.php';
 require_once 'inc/address_data_store.php';
 
-$ads = new AddressDataStore('data/contacts.csv');
+$ads = new AddressDataStore('data/contacts.csv', $dbc);
 
-//ADDS NEW CONTACT OR OUTPUTS AN ERROR
-if (!empty($_POST)) {
-    // $required = ['newName', 'newAddress', 'newCity', 'newState', 'newZip'];
-    // $error = false;
-    
-    // foreach($required as $form) {
-    //     if (strlen($_POST[$form]) > 125) {
-    //         throw new Exception("Please keep your entries below 125 characters.");
-    //     }
-    //     else {
-    //         $newContact[] = $_POST[$form];
-    //     }
-    // }
-    // if (!$error) {
-    //     $contacts[] = $newContact;
-    //     $ads->write($contacts);
-    // } 
+//ADDS NEW CONTACT
+if (!empty($_POST)) { 
      
     $ads->write_name_db($_POST);
     
@@ -29,17 +14,9 @@ if (!empty($_POST)) {
     // exit;
 }
 
-
 //UPLOADED CONTACT LIST
 if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
-    $upload_dir = 'uploads/';
-    $filename = basename($_FILES['UploadedCsv']['error']);
-    $saved_filename = $upload_dir . $filename;
-    move_uploaded_file($_FILES['UploadedCsv']['tmp_name'], $saved_filename);
-
-    $new_contacts = $ads->read($saved_filename);
-    $contacts = array_merge($contacts, $new_contacts);
-    $ads->write($contacts);
+    
 
     header('location: address_book.php');
     exit;
