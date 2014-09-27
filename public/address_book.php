@@ -21,7 +21,7 @@ if (isset($_GET['remove'])) {
 
     // $ads->write($contacts);
 }
-var_dump($names_row);
+
 ?>
 
 <?php include 'header.php'; ?>
@@ -32,14 +32,12 @@ var_dump($names_row);
 
 <!-- DISPLAYS ADDRESS BOOK IN DEFINITION LIST -->
     <div class="row">
-        <?php foreach($names_row as $key => $name): ?>
+        <?php foreach($names_row as $key => $person): ?>
         <div class="col-md-2">
             <dl>
-                <dt><?= htmlspecialchars(strip_tags($name['name'])); ?></dt>
-                <dd><?= htmlspecialchars(strip_tags($addresses['address'])); ?></dd>
-                <dd><?= htmlspecialchars(strip_tags($addresses['city'])) . ', ' . $addresses['state']; ?></dd>
-                <dd><?= htmlspecialchars(strip_tags($addresses['zip'])) . PHP_EOL; ?></dd>
-                <dd><a href=?remove=<?= $key; ?> class='btn-xs btn-danger'>Remove Contact</a></dd>
+                <dt><a href=""></a><?= htmlspecialchars(strip_tags($person['name'])); ?></dt>
+                <dd><?= htmlspecialchars(strip_tags($person['address'])); ?></dd>
+                <dd><a href=?remove=<?= $key; ?> class='btn btn-xs btn-default'>More Info</a></dd>
             </dl>
         </div>
         <?php endforeach; ?>

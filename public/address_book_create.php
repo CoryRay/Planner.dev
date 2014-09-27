@@ -8,7 +8,7 @@ $ads = new AddressDataStore('data/contacts.csv', $dbc);
 //ADDS NEW CONTACT
 if (!empty($_POST)) { 
      
-    $ads->write_name_db($_POST);
+    $ads->write_address_db($_POST);
     
     // header('location: address_book.php');
     // exit;
@@ -55,8 +55,12 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
                     <label for="newZip"class="sr-only">Zip Code</label>
                     <input type="number" id="newZip" name="newZip" placeholder='Zip Code' required>
                 </div>
+                <div class='form-group'>
+                    <label for="isPrimary">Is this your primary address?</label>
+                    <input type="checkbox" id="isPrimary" name="isPrimary" value="1">
+                </div>
                 <div class="form-group">
-                    <button class="btn btn-success">Add Contact</button>
+                    <button class="btn btn-sm btn-success">Add Contact</button>
                 </div>
             </form>
         </div>
@@ -73,7 +77,7 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
                     </select>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-success">Add Contact</button>
+                    <button class="btn btn-sm btn-success">Add Contact</button>
                 </div>
             </form>
         </div>
