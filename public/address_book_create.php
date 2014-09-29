@@ -56,8 +56,8 @@ if (count($_FILES) > 0 && $_FILES['UploadedCsv']['error'] == 0) {
                     <input type="number" id="newZip" name="newZip" placeholder='Zip Code' required>
                 </div>
                 <div class='form-group'>
-                    <label for="isPrimary">Is this your primary address?</label>
                     <input type="checkbox" id="isPrimary" name="isPrimary" value="1">
+                    <label for="isPrimary">Is this your primary address?</label>
                 </div>
                 <div class="form-group">
                     <button class="btn btn-sm btn-success">Add Contact</button>
