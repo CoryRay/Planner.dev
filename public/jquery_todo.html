@@ -15,7 +15,9 @@
             <h1>Todo List made with jQuory</h1>
             <div class='row'>
                 <div class='col-md-12'>
-                    <p>List here</p>
+                    <ul>
+                        <li>List here</li>
+                    </ul>
                 </div>
             </div>
 
@@ -35,6 +37,19 @@
         </div>
         
         <script>
+
+        var list = [
+            'Clean my room',
+            'Wash my car',
+            'Take out trash'
+        ]
+
+        var input = $(':button');
+
+        $(':button').click(function() {
+            $(this).preventDefault();
+            console.log($(this).text());
+        });
 
         </script>
     </body>
