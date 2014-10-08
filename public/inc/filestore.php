@@ -1,11 +1,13 @@
 <?php
 
-class Filestore {
+class Filestore
+{
 
     public $filename = '';
     public $is_csv = FALSE;
 
-    function __construct($filename = '') {
+    function __construct($filename = '')
+    {
 
         // Sets $this->filename
         $this->filename = $filename;
@@ -16,7 +18,8 @@ class Filestore {
         }
     }
 
-    public function read() {
+    public function read()
+    {
         if ($this->is_csv) {
             return $this->read_csv();
         } else {
@@ -25,7 +28,8 @@ class Filestore {
         
     }
 
-    public function write($array) {
+    public function write($array)
+    {
         if ($this->is_csv) {
             $this->write_csv($array);
         } else {
@@ -36,14 +40,16 @@ class Filestore {
     /*
      Returns array of lines in $this->filename
     */
-    private function read_lines() {
+    private function read_lines()
+    {
         return $array = file($this->filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     }
 
     /*
      Writes each element in $array to a new line in $this->filename
     */
-    private function write_lines($array) {
+    private function write_lines($array)
+    {
         $array = implode(PHP_EOL, $array);
         file_put_contents($this->filename, $array);
     }
@@ -51,7 +57,8 @@ class Filestore {
     /*
      Reads contents of csv $this->filename, returns an array
     */
-    private function read_csv() {
+    private function read_csv()
+    {
         return array_map('str_getcsv', file($this->filename));
         ////OR
         // $handle = fopen('$this->filename', 'r');
@@ -65,7 +72,8 @@ class Filestore {
     /*
      Writes contents of $array to csv $this->filename
     */
-    private function write_csv($array) {
+    private function write_csv($array)
+    {
         $handle = fopen($this->filename, 'w');
         foreach ($array as $key => $row) {
             fputcsv($handle, $row);

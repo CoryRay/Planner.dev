@@ -2,17 +2,20 @@
 
 require 'inc/filestore.php';
 
-class AddressDataStore extends Filestore {
+class AddressDataStore extends Filestore
+{
 
     public $dbc;
     public $previouslyExistingName = FALSE;
     
-    public function __construct($filename, $dbc) {
+    public function __construct($filename, $dbc)
+    {
         parent::__construct(strtolower($filename));
         $this->dbc = $dbc;
     }
 
-    public function read_name_db() { //WORKS
+    public function read_name_db() //WORKS
+    {
         $stmt = $this->dbc->query("SELECT names.name, addresses.address FROM names 
                                    JOIN addresses ON addresses.id = names.address_id
                                    WHERE addresses.is_primary = 1;");
@@ -20,14 +23,16 @@ class AddressDataStore extends Filestore {
         return $names_row = $stmt->fetchall(PDO::FETCH_ASSOC);
     }
 
-    public function read_address_db() { //UNFINISHED - may not be needed
+    public function read_address_db() //UNFINISHED - may not be needed
+    {
         $stmt = $this->dbc->query("SELECT *
                              FROM address");
 
         return $addresses_row = $stmt->fetchall(PDO::FETCH_ASSOC);
     }
 
-    public function write_address_db() {
+    public function write_address_db()
+    {
         if (isset($_POST['isPrimary'])) {
             $isPrimary = true;
         } else {
@@ -49,7 +54,8 @@ class AddressDataStore extends Filestore {
         $this->write_name_db();   
     }
     
-    public function write_name_db() {
+    public function write_name_db()
+    {
         $query = "INSERT INTO names (name, address_id)
                   VALUES (:name, :addressId)";
 
