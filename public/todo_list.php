@@ -85,7 +85,24 @@ $row = $stmt->fetchall();
                     </li>
                     <? endforeach; ?>
                 </ul>
+            </div>
+            <div class="col-md-6">
+                <!-- ADDING ITEMS TO TODO LIST -->
+                <h3>Add Item</h3>
 
+                <form method="POST" action="todo_list.php">
+                    <div class='form-group'>
+                        <label for="newItem">Enter new todo item:</label>
+                        <input type="text" id="newItem" class='form-control' name="newItem" autofocus required>
+                    </div>
+                    <div class="form-group">
+                        <button class='btn btn-default'>Add Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
                 <!-- UGLY PAGINATOR -->
                 <ul class="pager">
                     <? if ($offset > 0):
@@ -103,19 +120,6 @@ $row = $stmt->fetchall();
                 </ul>
             </div>
             <div class="col-md-6">
-                <!-- ADDING ITEMS TO TODO LIST -->
-                <h3>Add Item</h3>
-
-                <form method="POST" action="todo_list.php">
-                    <div class='form-group'>
-                        <label for="newItem">Enter new todo item:</label>
-                        <input type="text" id="newItem" class='form-control' name="newItem" autofocus required>
-                    </div>
-                    <div class="form-group">
-                        <button class='btn btn-primary'>Add Item</button>
-                    </div>
-                </form>
-
                 <!-- UPLOADING A NEW LIST -->
                 <h3>Upload a Todo List</h3>
 
@@ -125,7 +129,7 @@ $row = $stmt->fetchall();
                         <input type="file" id="file1" name="file1" required>
                     </div>
                     <div class="form-group">
-                        <button class='btn btn-primary'>Upload</button>
+                        <button class='btn btn-default'>Upload</button>
                     </div>
                 </form>
 

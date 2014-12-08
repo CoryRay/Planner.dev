@@ -1,13 +1,9 @@
 body {
     background-color: #99CCFF;
-    font-family: sans-serif;
-    text-decoration: black;
-    position: relative;
-    padding: 5px;
 }
 h2, h3 {
-    color: #669900
+    color: #669900;
 }
-div {
+.container {
     background-color: rgba(254, 254, 254, 1);
 }
