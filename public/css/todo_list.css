@@ -1,23 +1,13 @@
 body {
-	background-color: #99CCFF;
-	/*background-image: url('../img/blue_balls.gif');*/
-	font-family: sans-serif;
-/*	text-align: center;
-*/	text-decoration: black;
-	position: relative;
-	padding: 5px;
+    background-color: #99CCFF;
+    font-family: sans-serif;
+    text-decoration: black;
+    position: relative;
+    padding: 5px;
 }
 h2, h3 {
-	text-decoration: dashed;
-	color: #669900
-}
-ol {
-	/*list-style: none;*/
-	/*position: relative;*/
+    color: #669900
 }
 div {
-	background-color: rgba(254, 254, 254, .5);
-}
-button {
-	margin-bottom: 15px;
+    background-color: rgba(254, 254, 254, 1);
 }

@@ -11,7 +11,7 @@ if (!empty($_POST)) {
     $new_item = $_POST;
 
     $query = "INSERT INTO todo_list (todo_item)
-              VALUES (:todo_item)";
+    VALUES (:todo_item)";
 
     $prepare_to_add = $dbc->prepare($query);
 
@@ -26,7 +26,7 @@ if (isset($_GET['remove'])) {
     $keyToRemove = $_GET['remove'];
 
     $dbc->exec("DELETE FROM todo_list
-                WHERE id = $keyToRemove");
+        WHERE id = $keyToRemove");
 }
 
 //UPLOAD FILE AND ADD TO DATABASE
@@ -42,7 +42,7 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
     $uploaded_item = file($saved_filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     $insertQuery = "INSERT INTO todo_list (todo_item)
-                    VALUES (:uploaded_items)";
+    VALUES (:uploaded_items)";
 
     $prepare = $dbc->prepare($insertQuery);
 
@@ -56,75 +56,84 @@ if (count($_FILES) > 0 && $_FILES['file1']['error'] == 0) {
 }
 
 //READING FROM DATABASE, SHOULD BE LAST
-$stmt = $dbc->query("SELECT * 
-                     FROM todo_list LIMIT 10 OFFSET $offset");
+$stmt = $dbc->query("SELECT *
+ FROM todo_list LIMIT 10 OFFSET $offset");
 $row = $stmt->fetchall();
 
 ?>
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
-        <link type="text/css" rel="stylesheet" href="css/todo_list.css"/>
-        <title>Todo List</title>
-    </head>
-    <body>
-        <div class='container-fluid'>
+<head>
+    <meta charset="utf-8">
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.min.css"/>
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/todo_list.css"/>
+    <title>Todo List</title>
+</head>
+<body>
+    <div class='container'>
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Todo List</h2>
 
-            <h2>Todo List</h2>
-
-    <!-- DISPLAY TODO LIST -->
-            <ul id='list'>
-                <? foreach ($row as $key => $value) : ?>
-                    <li> 
-                        <a href="?remove=<?= $value['id']; ?>">Complete</a> -  
-                        <?= htmlspecialchars(strip_tags($value['todo_item'])); ?>
+                <!-- DISPLAY TODO LIST -->
+                <ul id='list'>
+                    <? foreach ($row as $key => $value) : ?>
+                    <li>
+                        <a href="?remove=<?= $value['id']; ?>">Complete</a> - <?= htmlspecialchars(strip_tags($value['todo_item'])); ?>
                     </li>
-                <? endforeach; ?>
-            </ul>
+                    <? endforeach; ?>
+                </ul>
 
-    <!-- UGLY PAGINATOR -->
-            <ul class="pagination">
-                <? if ($offset > 0):
-                    echo "<li><a class='prev' href='?offset=" . ($offset - 10) . "'>&#171;</a></li>";
-                   else:
-                    echo "<li><a class='prev disabled' href='#'>&#171;</a></li>";
-                   endif;
-                ?>
-                <? if ($offset <= count($row)):
-                    echo "<li><a class='next' href='?offset=" . ($offset + 10) . "'>&#187;</a></li>";
-                   else:
-                    echo "<li><a class='next disabled' href='#'>&#187;</a></li>";
-                   endif;
-                ?>
-            </ul>
+                <!-- UGLY PAGINATOR -->
+                <ul class="pager">
+                    <? if ($offset > 0):
+                    echo "<li><a href='?offset=" . ($offset - 10) . "'>Previous</a></li>";
+                    else:
+                        echo "<li><a class='disabled' href='#'>Previous</a></li>";
+                    endif;
+                    ?>
+                    <? if ($offset <= count($row)):
+                    echo "<li><a href='?offset=" . ($offset + 10) . "'>Next</a></li>";
+                    else:
+                        echo "<li><a class='disabled' href='#'>Next</a></li>";
+                    endif;
+                    ?>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <!-- ADDING ITEMS TO TODO LIST -->
+                <h3>Add Item</h3>
 
-    <!-- ADDING ITEMS TO TODO LIST -->
-            <h3>Add Item</h3>
+                <form method="POST" action="todo_list.php">
+                    <div class='form-group'>
+                        <label for="newItem">Enter new todo item:</label>
+                        <input type="text" id="newItem" class='form-control' name="newItem" autofocus required>
+                    </div>
+                    <div class="form-group">
+                        <button class='btn btn-primary'>Add Item</button>
+                    </div>
+                </form>
 
-            <form method="POST" action="todo_list.php">
-                <p>
-                    <label for="newItem">Enter new todo item:</label>
-                    <input type="text" id="newItem" name="newItem" autofocus required>
-                </p>
-                <button>Add Item</button>
-            </form>
+                <!-- UPLOADING A NEW LIST -->
+                <h3>Upload a Todo List</h3>
 
-    <!-- UPLOADING A NEW LIST -->
-            <h3>Upload a Todo List</h3>
+                <form method="POST" enctype="multipart/form-data" action="todo_list.php">
+                    <div class='form-group'>
+                        <label for="file1">File to upload: </label>
+                        <input type="file" id="file1" name="file1" required>
+                    </div>
+                    <div class="form-group">
+                        <button class='btn btn-primary'>Upload</button>
+                    </div>
+                </form>
 
-            <form method="POST" enctype="multipart/form-data" action="todo_list.php">
-                <p>
-                    <label for="file1">File to upload: </label>
-                    <input type="file" id="file1" name="file1" required>
-                   <p><input type="submit" value="Upload"></p>
-                </p>
-            </form>
+                <?= isset($saved_filename) ? '<div class="alert alert-info" role="alert">Upload Successful!</div>' : "" ; ?>
 
-            <?= isset($saved_filename) ? '<div class="alert alert-info" role="alert">Upload Successful!</div>' : "" ; ?>
-        
+            </div>
         </div>
-    </body> 
+    </div>
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+</body>
 </html>
