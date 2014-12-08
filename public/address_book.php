@@ -41,5 +41,7 @@ if (isset($_GET['remove'])) {
             </dl>
         </div>
         <?php endforeach; ?>
+    </div>
+</div>
 
 <?php include 'footer.php'; ?>
